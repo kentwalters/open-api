@@ -6,14 +6,20 @@ import EndPointRow from "./EndPointRow";
 export default class EndPointBlock extends React.Component<any, any> {
 
     render() {
+        this.props.paths.forEach((path: any) => {
+            console.log(path)
+        })
         return(
             <div>
                 <EndPointHeader tag={this.props.tag}/>
-                {Object.keys(this.props.paths).map((path: any) => {
-                    return (
-                        <EndPointRow path={this.props.paths[path]}/>
-                    )
-                })}
+                {
+
+                    this.props.paths.filter((path: any) => path.tag == this.props.tag.name).map((path: any) => {
+                        return (
+                            <EndPointRow details={path}/>
+                        )
+                    })
+                }
 
             </div>
         )
