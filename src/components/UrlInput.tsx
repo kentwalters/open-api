@@ -2,37 +2,40 @@ import React from 'react';
 import InputGroup from 'react-bootstrap/InputGroup';
 import FormControl from 'react-bootstrap/FormControl';
 import Button from 'react-bootstrap/Button';
+import axios from 'axios';
 
 export default class UrlInput extends React.Component {
+
+    loadApi() {
+        axios.create({
+            baseURL: '',
+            responseType: 'json'
+        })
+
+        axios.get('https://petstore.swagger.io/v2/swagger.json')
+            .then((data) => {
+                console.log(data)
+            })
+            .catch(error => {
+                console.log(error)
+            })
+
+    }
 
     render() {
         return(
             <div>
                 <InputGroup className="mb-3">
                     <FormControl
-                        placeholder="Recipient's username"
-                        aria-label="Recipient's username"
+                        placeholder="https://petstore.swagger.io/v2/swagger.json"
+                        aria-label="Open API Url"
                         aria-describedby="basic-addon2"
                     />
                     <InputGroup.Append>
-                        <Button variant="outline-secondary">Button</Button>
+                        <Button onClick={this.loadApi} variant="outline-secondary">Load</Button>
                     </InputGroup.Append>
                 </InputGroup>
             </div>
         )
     }
 }
-
-// export default UrlInput;
-
-
-// type MyContext = number
-// * const Ctx = React.createContext<MyContext>(0)
-//     *
-//     * class Foo extends React.Component {
-//         *   static contextType = Ctx
-//             *   context!: React.ContextType<typeof Ctx>
-//         *   render () {
-//         *     return <>My context's value: {this.context}</>;
-//         *   }
-//     * }

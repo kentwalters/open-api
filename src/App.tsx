@@ -1,29 +1,43 @@
 import React from 'react';
 import './App.css';
-import TestComponent from './components/TestComponent';
 import UrlInput from './components/UrlInput';
+import Row from 'react-bootstrap/row';
+import Col from 'react-bootstrap/Col';
+import ApiInfo from "./components/ApiInfo";
+import EndPointBlock from "./components/EndPointBlock";
+import SwaggerParser from 'swagger-parser';
 
-const App: React.FC = () => {
-  return (
-    <div className="App">
-      <header className="App-header">
-        {/*<img src={logo} className="App-logo" alt="logo" />*/}
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-        <TestComponent></TestComponent>
-        <UrlInput></UrlInput>
-      </header>
-    </div>
-  );
+const sampleJson = require('./swagger.json');
+
+export default class App extends React.Component{
+    constructor(props: any) {
+        super(props)
+
+        console.log(sampleJson)
+
+        SwaggerParser.validate(sampleJson, (err, api) => {
+            if (err) {
+                console.error(err)
+            }
+            if(api) {
+                console.log("API name: %s, Version: %s", api.info.title, api.info.version);
+            }
+
+        })
+    }
+
+    render() {
+        return (
+            <div className='width-wrapper'>
+                <Row>
+                    <Col>
+                        <UrlInput></UrlInput>
+                        <ApiInfo/>
+                        <EndPointBlock/>
+                    </Col>
+                </Row>
+            </div>
+
+        );
+    }
 }
-
-export default App;
