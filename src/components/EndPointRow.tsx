@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 
-export default class EndPointRow extends React.Component {
+export default class EndPointRow extends React.Component<any, any> {
     render() {
         return (
             <div className='end-point-row'>

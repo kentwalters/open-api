@@ -10,21 +10,7 @@ import SwaggerParser from 'swagger-parser';
 const sampleJson = require('./swagger.json');
 
 export default class App extends React.Component{
-    constructor(props: any) {
-        super(props)
-
-        console.log(sampleJson)
-
-        SwaggerParser.validate(sampleJson, (err, api) => {
-            if (err) {
-                console.error(err)
-            }
-            if(api) {
-                console.log("API name: %s, Version: %s", api.info.title, api.info.version);
-            }
-
-        })
-    }
+    api: any = sampleJson;
 
     render() {
         return (
@@ -32,8 +18,11 @@ export default class App extends React.Component{
                 <Row>
                     <Col>
                         <UrlInput></UrlInput>
-                        <ApiInfo/>
-                        <EndPointBlock/>
+                        <ApiInfo info={this.api.info}/>
+                        {this.api.tags.map((tag: any) => {
+                            return(<EndPointBlock tag={tag} paths={this.api.paths}/>)
+                        })}
+
                     </Col>
                 </Row>
             </div>
