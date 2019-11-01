@@ -1,6 +1,7 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import TestComponent from './components/TestComponent';
+import UrlInput from './components/UrlInput';
 
 const App: React.FC = () => {
   return (
@@ -18,6 +19,8 @@ const App: React.FC = () => {
         >
           Learn React
         </a>
+        <TestComponent></TestComponent>
+        <UrlInput></UrlInput>
       </header>
     </div>
   );
