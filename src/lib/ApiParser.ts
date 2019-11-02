@@ -27,6 +27,12 @@ export default class ApiParser {
         return api.tags || api.getTags().length;
     }
 
+    getBaseUrl(api: any) {
+        return 'https://' + api.host + api.basePath;
+    }
+
+
+
     getPathsForMethod(api: any) {
         let trans: any[] = [];
 
@@ -37,6 +43,10 @@ export default class ApiParser {
                 ob.method = method;
                 ob.path = path;
                 ob.details = api.paths[path][method];
+
+                if (!ob.details.parameters) {
+                    ob.details.parameters = [];
+                }
 
                 if (api.paths[path][method]['tags']) {
                     ob.tag = api.paths[path][method]['tags'][0];

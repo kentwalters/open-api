@@ -4,7 +4,6 @@ import Collapse from 'react-bootstrap/Collapse';
 export default class ResponseContainer extends React.Component<any, any> {
     constructor(props: any) {
         super(props);
-
     }
 
     render() {
@@ -17,7 +16,6 @@ export default class ResponseContainer extends React.Component<any, any> {
                     </div>
                 </div>
             </Collapse>
-
         )
     }
 }

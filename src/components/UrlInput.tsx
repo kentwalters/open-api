@@ -14,23 +14,19 @@ export default class UrlInput extends React.Component<any, any> {
         }
     }
 
-    //  https://petstore.swagger.io/v2/swagger.json
-
     loadApi = () => {
         axios.create({
             baseURL: '',
             responseType: 'json'
         });
 
-
         axios.get(this.state.url)
-            .then((data: any) => {
-                this.props.gotNewApi(data.data)
+            .then((response: any) => {
+                this.props.gotNewApi(response.data)
             })
             .catch(error => {
                 console.log(error)
-            })
-
+            });
     };
 
     handleChange = (e: any) => {
@@ -48,7 +44,7 @@ export default class UrlInput extends React.Component<any, any> {
                         aria-label="Open API Url"
                         aria-describedby="basic-addon2"
                         value={this.state.url}
-                        onChange={this.handleChange.bind(this)}
+                        onChange={this.handleChange}
                     />
                     <InputGroup.Append>
                         <Button onClick={this.loadApi} variant="outline-secondary">Load</Button>

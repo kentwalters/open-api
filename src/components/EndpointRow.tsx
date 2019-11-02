@@ -1,7 +1,7 @@
 import React from 'react';
 import Button from 'react-bootstrap/Button';
 import Collapse from 'react-bootstrap/Collapse';
-import EndPointDetail from "./EndpointDetail";
+import EndpointDetail from "./EndpointDetail";
 import Badge from 'react-bootstrap/Badge';
 
 export default class EndpointRow extends React.Component<any, any> {
@@ -34,27 +34,32 @@ export default class EndpointRow extends React.Component<any, any> {
         return (
             <div>
                 <div className='end-point-row'>
-                    <Badge
-                        variant={this.mapMethodToBadgeVariant(this.props.details.method)}
-                    >{this.props.details.method.toUpperCase()}</Badge>
+                    <Badge variant={this.mapMethodToBadgeVariant(this.props.details.method)}>
+                        {this.props.details.method.toUpperCase()}
+                    </Badge>
+
                     <p className='code'>{this.props.details.path}</p>
+
                     <p><b>{this.props.details.details.summary}</b></p>
+
                     <Button
                         variant='secondary'
                         className='end-point-row-last'
                         onClick={() => this.setState({ open: !open })}
                         aria-controls="example-collapse-text"
-                        aria-expanded={open}
-                    >{this.state.open ? 'Close' : 'Try it'}</Button>
+                        aria-expanded={open}>
+                        {this.state.open ? 'Close' : 'Try it'}
+                    </Button>
                 </div>
 
                 <Collapse in={this.state.open} >
                     <div id="example-collapse-text" >
-                        <EndPointDetail
-                            api={this.props.api}
+                        <EndpointDetail
+                            baseUrl={this.props.baseUrl}
                             path={this.props.details.path}
                             method={this.props.details.method}
-                            request={this.props.details.details}/>
+                            request={this.props.details.details}
+                        />
                     </div>
                 </Collapse>
             </div>
