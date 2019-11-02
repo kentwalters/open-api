@@ -4,10 +4,11 @@ import UrlInput from './components/UrlInput';
 import ApiInfo from "./components/ApiInfo";
 import EndPointBlock from "./components/EndpointBlock";
 import SwaggerParser from 'swagger-parser';
-import ApiParser from "./utils/ApiParser";
+import ApiParser from "./lib/ApiParser";
 
 const sampleJson = require('./swagger.json');
 // const sampleJson = require('./uber.json');
+// const sampleJson = require('./swagger.yaml');
 
 export default class App extends React.Component<any, any>{
     api: any = sampleJson;
@@ -44,4 +45,30 @@ export default class App extends React.Component<any, any>{
 
         );
     }
+}
+
+// The subset of the OpenAPI spec that this application currently supports
+interface ParsedApi {
+    info: {
+        "description": string,
+        "version": string,
+        "title": string,
+        "termsOfService": string,
+        "contact":{
+            "email": string
+        },
+        "license":{
+            "name": string,
+            "url":string
+        }
+    }
+    tags: [
+        {
+            "name": string,
+            "description": string,
+            "paths": [
+
+                ]
+        }
+        ]
 }

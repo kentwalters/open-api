@@ -8,6 +8,7 @@ export default class EndpointBlock extends React.Component<any, any> {
         return(
             <div>
                 <EndPointHeader tag={this.props.tag}/>
+
                 {
                     this.props.paths.filter((path: any) => path.tag === this.props.tag.name).map((path: any) => {
                         return (
@@ -15,7 +16,6 @@ export default class EndpointBlock extends React.Component<any, any> {
                         )
                     })
                 }
-
             </div>
         )
     }

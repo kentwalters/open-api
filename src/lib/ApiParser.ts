@@ -20,7 +20,7 @@ export default class ApiParser {
         //     return tags;
         // }
 
-        return [];
+        return this.getPathsForMethod(api).map(a => a.tag);
     }
 
     hasTags(api: any) {
@@ -37,13 +37,24 @@ export default class ApiParser {
                 ob.method = method;
                 ob.path = path;
                 ob.details = api.paths[path][method];
-                ob.tag = api.paths[path][method]['tags'][0];
+
+                if (api.paths[path][method]['tags']) {
+                    ob.tag = api.paths[path][method]['tags'][0];
+                } else {
+                    ob.tag = {name: 'A'}
+                }
+
 
                 trans.push(ob)
 
             })
         });
+        console.log(trans)
 
         return trans;
+    }
+
+    getFormattedData(api: any) {
+
     }
 }

@@ -1,21 +1,22 @@
 import React, {RefObject} from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
-import axios from 'axios';
-import RequestBuilder from "../utils/RequestBuilder";
+import RequestBuilder from "../lib/RequestBuilder";
 import ResponseContainer from "./ResponseContainer";
 
 export default class EndpointDetail extends React.Component<any, any> {
-    axios: any;
 
     constructor(props: any) {
         super(props);
 
         this.state = {
-            args: [],
-            response: null,
-            status: null,
-            statusText: null
+            args: {},
+            response: {
+                status: null,
+                statusText: null,
+                data: null
+            },
+            openPanel: false,
         }
 
     }
@@ -24,16 +25,57 @@ export default class EndpointDetail extends React.Component<any, any> {
         event.preventDefault();
         let rb = new RequestBuilder(this.props.api);
 
-        rb.request(this.props.method, this.props.path)
+        rb.request(this.props.method, this.props.path, this.state.args)
             .then(resp => {
                 console.log(resp)
 
                 this.setState({
-                    status: resp.status,
-                    statusText: resp.statusText
+                    response: {
+                        status: resp.status,
+                        statusText: resp.statusText,
+                        data: resp.data
+                    },
+                    openPanel: true
                 });
             })
-            .catch(error => console.log(error))
+            .catch(error => {
+                console.log(error.response)
+                this.setState({
+                    response: {
+                        status: error.response.status,
+                        statusText: error.response.statusText,
+                        data: error.response.data
+                    },
+                    openPanel: true
+                })
+            })
+    };
+
+    getParameterString(param: any) {
+        let str = '';
+
+        str += param.required? 'Required' : 'Optional';
+
+        str += param.type ? ' | ' + param.type : '';
+
+        str += param.format ? ': ' + param.format : '';
+
+        return str
+    }
+
+    handleChange = (event: any) => {
+        const value = event.target.value;
+        const param = event.target.id;
+
+        let ob: any = {};
+        ob[param] = value;
+
+        console.log(value)
+        console.log(param)
+
+        this.setState((prevState: any)=> ({
+            args: ob
+        }));
     };
 
     render() {
@@ -45,13 +87,14 @@ export default class EndpointDetail extends React.Component<any, any> {
                     <Form onSubmit={this.handleSubmit}>
                         {this.props.request.parameters.map((param:any) => {
                             return (
-                                <Form.Group key={param.name} controlId={`formControl${param.name}`}>
+                                <Form.Group key={param.name} controlId={param.name}>
                                     <Form.Label>{param.name}</Form.Label>
                                     <Form.Control
+                                        onChange={this.handleChange}
                                         type=""
                                         placeholder={param.name} />
                                     <Form.Text className="text-muted">
-                                        {param.required? 'Required' : 'Optional'}
+                                        {this.getParameterString(param)}
                                     </Form.Text>
                                 </Form.Group>
                             )
@@ -65,12 +108,15 @@ export default class EndpointDetail extends React.Component<any, any> {
                     </Form>
                 </div>
 
-                <ResponseContainer open={this.state.status != null}  status={this.state.status}/>
+                <ResponseContainer open={this.state.openPanel} response={this.state.response}/>
 
                 <h5>Responses</h5><hr></hr>
                 {Object.keys(this.props.request.responses).map((response:any) => {
                     return (
-                        <p key={response} className='code'>{response}: {this.props.request.responses[response].description}</p>
+                        <p
+                            key={response}
+                            className='code'
+                        >{response}: {this.props.request.responses[response].description}</p>
                     )
                 })}
             </div>

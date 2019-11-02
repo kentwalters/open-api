@@ -72,3 +72,15 @@
 .request-form-container {
   margin-bottom: 20px;
 }
+
+.response-data-block {
+  background-color: #4e555b;
+  padding: 10px;
+  border-radius: 0.25rem;
+  margin-bottom: 10px;
+}
+
+.response-data-block pre {
+  color: white;
+  margin: 0
+}
