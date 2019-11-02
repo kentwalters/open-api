@@ -1,17 +1,17 @@
 import React from 'react';
 import './App.css';
 import UrlInput from './components/UrlInput';
-import Row from 'react-bootstrap/row';
-import Col from 'react-bootstrap/Col';
 import ApiInfo from "./components/ApiInfo";
-import EndPointBlock from "./components/EndPointBlock";
+import EndPointBlock from "./components/EndpointBlock";
 import SwaggerParser from 'swagger-parser';
+import ApiParser from "./utils/ApiParser";
 
 const sampleJson = require('./swagger.json');
 // const sampleJson = require('./uber.json');
 
 export default class App extends React.Component<any, any>{
     api: any = sampleJson;
+    parser: ApiParser = new ApiParser();
 
     constructor(props: any, context: any) {
         super(props, context);
@@ -22,53 +22,26 @@ export default class App extends React.Component<any, any>{
         return {
             tags: fromApi.tags,
             info: fromApi.info,
-            paths: this.transformApiDoc(fromApi)
+            paths: this.parser.getPathsForMethod(fromApi),
+            api: fromApi
         }
-    }
-
-    transformApiDoc(api: any) {
-        let trans: any[] = [];
-
-        Object.keys(api.paths).forEach((path: any) => {
-
-            Object.keys(api.paths[path]).forEach(method => {
-                let ob: any = {};
-                ob.method = method;
-                ob.path = path;
-                ob.details = api.paths[path][method];
-                ob.tag = api.paths[path][method]['tags'][0];
-
-                trans.push(ob)
-
-            })
-        });
-
-        return trans;
     }
 
     gotNewApi = (api: any) => {
         this.setState(this.generateState(api))
-    }
+    };
 
     render() {
-        if (this.api) {
+        return (
+            <div className='width-wrapper'>
+                <UrlInput gotNewApi={this.gotNewApi}/>
+                <ApiInfo info={this.state.info}/>
 
-            return (
-                <div className='width-wrapper'>
-                    <Row>
-                        <Col>
-                            <UrlInput gotNewApi={this.gotNewApi}/>
-                            <ApiInfo info={this.state.info}/>
+                {this.parser.getTags(this.state).map((tag: any) => {
+                    return (<EndPointBlock api={this.state.api} key={tag.name} tag={tag} paths={this.state.paths}/>)
+                })}
+            </div>
 
-                            {this.state.tags.map((tag: any) => {
-                                return (<EndPointBlock tag={tag} paths={this.state.paths}/>)
-                            })}
-
-                        </Col>
-                    </Row>
-                </div>
-
-            );
-        }
+        );
     }
 }

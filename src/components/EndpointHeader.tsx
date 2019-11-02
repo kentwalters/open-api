@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default class EndPointHeader extends React.Component<any, any> {
+export default class EndpointHeader extends React.Component<any, any> {
     render() {
         return(
             <div className='end-point-header'>
