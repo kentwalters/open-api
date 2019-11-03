@@ -115,9 +115,12 @@ export default class RequestBuilder {
     }
 
     static convertServerResponseToResponseState(response: any): RequestResponseState {
+        const corsError = 'Error. Most likely a CORS issue which would say: ' +
+            'No \'Access-Control-Allow-Origin\' header is present on the requested resource.';
+
         return {
             status: response ? response.status : '',
-            statusText: response ? response.statusText : '',
+            statusText: response ? response.statusText : corsError,
             data: response ? response.data : {}
         };
     }
