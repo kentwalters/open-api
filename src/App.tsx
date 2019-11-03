@@ -6,12 +6,11 @@ import EndPointBlock from "./components/EndpointBlock";
 import ApiParser from "./lib/ApiParser";
 import SettingsBlock from "./components/SettingsBlock";
 
-const sampleJson = require('./swagger.json');
-// const sampleJson = require('./uber.json');
-// const sampleJson = require('./swagger.yaml');
+const defaultApiSpec = require('./swagger.json');
+// const defaultApiSpec = require('./uber.json');
 
 export default class App extends React.Component<any, any>{
-    api: any = sampleJson;
+    api: any = defaultApiSpec;
     parser: ApiParser = new ApiParser();
 
     constructor(props: any, context: any) {
@@ -33,7 +32,7 @@ export default class App extends React.Component<any, any>{
         this.setState({
             scheme: scheme
         });
-    }
+    };
 
     render() {
         return (

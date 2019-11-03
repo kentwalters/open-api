@@ -18,7 +18,7 @@ export default class SettingsBlock extends React.Component<any, any> {
                             <Form.Group controlId="exampleForm.ControlSelect1">
                                 <Form.Control onChange={this.handleSelect} as="select">
                                     {this.props.schemes.map((scheme:any) => {
-                                        return (<option>{scheme.toUpperCase()}</option>)
+                                        return (<option key={scheme}>{scheme.toUpperCase()}</option>)
                                     })}
                                 </Form.Control>
                             </Form.Group>

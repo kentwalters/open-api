@@ -27,14 +27,11 @@ export default class UrlInput extends React.Component<any, any> {
             .then((response: any) => {
                 let data = response.data;
 
-                if (type === 'json') {
-                    this.props.gotNewApi(data)
-                }
-
                 if (type === 'yaml') {
-                    this.props.gotNewApi(yaml.safeLoad(data))
+                    data = yaml.safeLoad(data);
                 }
 
+                this.props.gotNewApi(data);
             })
             .catch(error => {
                 console.log(error)

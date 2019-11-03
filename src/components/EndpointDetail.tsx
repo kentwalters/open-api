@@ -28,7 +28,7 @@ export default class EndpointDetail extends React.Component<any, any> {
     handleSubmit = (event: any) => {
         event.preventDefault();
         let rb = new RequestBuilder(this.props.scheme, this.props.baseUrl);
-        rb.request(this.props.method, this.props.path, this.state.args, this.handleResponse, this.props.request)
+        rb.request(this.props.method, this.props.path, this.state.args, this.props.request, this.handleResponse)
     };
 
     handleResponse = (response: RequestResponseState, request: AxiosRequestConfig) => {

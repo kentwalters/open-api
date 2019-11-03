@@ -8,10 +8,10 @@ export default class RequestBuilder {
         this.setUpBaseUrl(scheme, baseUrl)
     }
 
-    request(method: Method, path: string, args: any, cb: any, request: any) {
+    request(method: Method, path: string, args: any, request: any, cb: any) {
         this.setMethod(method);
         this.addPathToUrl(path);
-        this.addParametersToRequest(request, args);
+        this.addParametersToRequest(request, args)
         this.sendRequest(cb);
     }
 
@@ -37,94 +37,88 @@ export default class RequestBuilder {
         this.config.baseURL += path;
     }
 
-    addParameterFromPath(value: any, param: string){
-        if (this.config.baseURL) {
-            this.config.baseURL = this.config.baseURL.replace(`{${param}}`, value);
-        }
-    }
-
-    addParameterFromHeader(name: string, value: string) {
-        if (!this.config.headers) {
-            this.config.headers = {}
-        }
-
-        this.config.headers[name] = value;
-    }
-
-    addParametersFromQuery(params: any) {
-        this.config.baseURL += '?';
-        this.config.baseURL += this.encodeObject(params);
-    }
-
-    addParametersFromForm(params: any) {
-        this.config.baseURL += '?';
-        this.config.baseURL += this.encodeObject(params);
-    }
-
-    addParameterFromBody(params: any, args: any) {
-        try {
-            this.config.data = JSON.parse(args[params.name]);
-        } catch (error) {
-            this.config.data = {};
-        }
-    }
-
     encodeObject(parameters: any) {
         return Object.keys(parameters).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(parameters[k])}`).join('&');
     }
 
     addParametersToRequest(request: any, args: any) {
-        if(request.parameters.length) {
-            let queryParams: any = {};
-            let formParams: any = {};
 
-            request.parameters.forEach((param: any) => {
-                switch (param.in) {
-                    case 'path':
-                        this.addParameterFromPath(args[param.name], param.name);
-                        break;
-                    case 'header':
-                        this.addParameterFromHeader(param.name, args[param.name]);
-                        break;
-                    case 'query':
-                        if (args[param.name]) {
-                            queryParams[param.name] = args[param.name];
-                        }
-                        break;
-                    case 'formData':
-                        if (args[param.name]) {
-                            queryParams[param.name] = args[param.name];
-                        }
-                        break;
-                    case 'body':
-                        this.addParameterFromBody(param, args);
-                        break;
-                }
-            });
+        // We have to group our parameters by their location in the request,
+        // after that we can send them to the appropriate function to get added.
 
-            if (Object.keys(formParams).length) {
-                this.addParametersFromForm(formParams);
-            }
+        // From the spec
+        const locationTypes: any = {
+            path: {},
+            header: {},
+            query: {},
+            formData: {},
+            body: {}
+        };
 
-            if (Object.keys(queryParams).length) {
-                this.addParametersFromQuery(queryParams);
-            }
+        Object.keys(args).forEach((key: string) => {
+            // "Find the value of the property 'in' from the parameter with name == key"
+            let location = request.parameters.filter((param: any) => {return param.name === key})[0].in;
+
+            // Add parameter to appropriate collection
+            locationTypes[location][key] = args[key];
+        });
+
+        // Now we can add each type of parameter to the request
+        // This isn't super DRY, but we'd have to have a mapping between the location and the appropriate
+        // adder function anyway, and considering the amount of object.key iteration we already have going
+        // on, I think this is more readable.
+        this.addParameterFromPathNice(locationTypes.path);
+        this.addParameterFromHeaderNice(locationTypes.header);
+        this.addParametersFromQueryNice(locationTypes.query);
+        this.addParametersFromForm(locationTypes.formData);
+        this.addParameterFromBodyNice(locationTypes.body);
+    }
+
+    addParameterFromBodyNice(parameters: any) {
+        try {
+            this.config.data = JSON.parse(parameters.body);
+        } catch (error) {
+            this.config.data = {};
         }
     }
 
-    static convertServerResponseToResponseState(response: any): RequestResponseState {
-        if (!response) {
-            return {
-                status: '000',
-                statusText: 'The error was with this application, not your request',
-                data: {}
-            }
+    addParametersFromForm(params: any) {
+        if (Object.keys(params).length) {
+            this.config.baseURL += '?';
+            this.config.baseURL += this.encodeObject(params);
+        }
+    }
+
+    addParametersFromQueryNice(params: any) {
+        if (Object.keys(params).length) {
+            this.config.baseURL += '?';
+            this.config.baseURL += this.encodeObject(params);
+        }
+    }
+
+    addParameterFromHeaderNice(parameters: any) {
+        if (!this.config.headers) {
+            this.config.headers = {}
         }
 
+        Object.keys(parameters).forEach((key: any) => {
+            this.config.headers[key] = parameters[key];
+        });
+    }
+
+    addParameterFromPathNice(parameter: any){
+        Object.keys(parameter).forEach((key: any) => {
+            if (this.config.baseURL) {
+                this.config.baseURL = this.config.baseURL.replace(`{${key}}`, parameter[key]);
+            }
+        });
+    }
+
+    static convertServerResponseToResponseState(response: any): RequestResponseState {
         return {
-            status: response.status,
-            statusText: response.statusText,
-            data: response.data
+            status: response ? response.status : '',
+            statusText: response ? response.statusText : '',
+            data: response ? response.data : {}
         };
     }
 }
