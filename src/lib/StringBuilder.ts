@@ -11,4 +11,19 @@ export default class SB {
 
         return str
     }
+
+    mapMethodToBadgeVariant(method: string) {
+        switch (method) {
+            case 'get':
+                return 'success';
+            case 'post':
+                return 'info';
+            case 'delete':
+                return 'danger';
+            case 'put':
+                return 'warning';
+            default:
+                return 'secondary';
+        }
+    }
 }

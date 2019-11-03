@@ -4,6 +4,7 @@ import UrlInput from './components/UrlInput';
 import ApiInfo from "./components/ApiInfo";
 import EndPointBlock from "./components/EndpointBlock";
 import ApiParser from "./lib/ApiParser";
+import SettingsBlock from "./components/SettingsBlock";
 
 const sampleJson = require('./swagger.json');
 // const sampleJson = require('./uber.json');
@@ -17,7 +18,8 @@ export default class App extends React.Component<any, any>{
         super(props, context);
 
         this.state = {
-            api: this.api
+            api: this.api,
+            scheme: this.api.schemes[0]
         }
     }
 
@@ -27,12 +29,20 @@ export default class App extends React.Component<any, any>{
         })
     };
 
+    changeScheme = (scheme: string) => {
+        this.setState({
+            scheme: scheme
+        });
+    }
+
     render() {
         return (
             <div className='width-wrapper'>
                 <UrlInput gotNewApi={this.gotNewApi}/>
                 <ApiInfo info={this.state.api.info}/>
+                <SettingsBlock set={this.changeScheme} schemes={this.state.api.schemes}/>
                 <EndPointBlock
+                    scheme={this.state.scheme}
                     baseUrl={this.parser.getBaseUrl(this.state.api)}
                     paths={this.parser.getPathsForMethod(this.state.api)}
                 />

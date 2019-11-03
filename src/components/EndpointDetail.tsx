@@ -1,10 +1,12 @@
-import React, {RefObject} from 'react';
+import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import RequestBuilder, {RequestResponseState} from "../lib/RequestBuilder";
 import ResponseContainer from "./ResponseContainer";
 import SB from '../lib/StringBuilder';
 import ResponseList from "./ResponseList";
+import RequestContainer from "./RequestContainer";
+import {AxiosRequestConfig} from "axios";
 
 export default class EndpointDetail extends React.Component<any, any> {
 
@@ -18,18 +20,20 @@ export default class EndpointDetail extends React.Component<any, any> {
                 statusText: null,
                 data: null
             },
+            request: {},
             openPanel: false,
         }
     }
 
     handleSubmit = (event: any) => {
         event.preventDefault();
-        let rb = new RequestBuilder(this.props.baseUrl);
-        rb.request(this.props.method, this.props.path, this.state.args, this.handleResponse, [])
+        let rb = new RequestBuilder(this.props.scheme, this.props.baseUrl);
+        rb.request(this.props.method, this.props.path, this.state.args, this.handleResponse, this.props.request)
     };
 
-    handleResponse = (response: RequestResponseState ) => {
+    handleResponse = (response: RequestResponseState, request: AxiosRequestConfig) => {
         this.setState({
+            request: request,
             response: response,
             openPanel: true
         });
@@ -79,19 +83,9 @@ export default class EndpointDetail extends React.Component<any, any> {
                     </Form>
                 </div>
 
+                <RequestContainer open={this.state.openPanel} request={this.state.request}/>
                 <ResponseContainer open={this.state.openPanel} response={this.state.response}/>
-
-
                 <ResponseList responses={this.props.request.responses}/>
-
-                {/*{Object.keys(this.props.request.responses).map((response:any) => {*/}
-                    {/*return (*/}
-                        {/*<p*/}
-                            {/*key={response}*/}
-                            {/*className='code'*/}
-                        {/*>{response}: {this.props.request.responses[response].description}</p>*/}
-                    {/*)*/}
-                {/*})}*/}
             </div>
         )
     }

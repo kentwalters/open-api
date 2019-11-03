@@ -4,39 +4,75 @@ export default class RequestBuilder {
 
     config: AxiosRequestConfig = {};
 
-    constructor(baseUrl: string) {
-        this.config.baseURL = baseUrl;
+    constructor(scheme: string, baseUrl: string) {
+        this.config.baseURL = scheme.toLocaleLowerCase() + '://' + baseUrl;
     }
 
-    static buildUrlWithParams(url: string, args: any) {
-        let startOfBraces = url.indexOf('{');
+    addParametersToPath(value: any, param: string){
+        if (this.config.baseURL) {
+            this.config.baseURL = this.config.baseURL.replace(`{${param}}`, value);
+        }
+    }
 
-        if (startOfBraces === -1) {
-            return url;
+    addParametersToHeader(name: string, value: string) {
+        if (!this.config.headers) {
+            this.config.headers = {}
         }
 
-        const endOfBraces = url.indexOf('}');
-        const parameterName = url.slice(startOfBraces + 1, endOfBraces);
-
-        return url.replace('{' + parameterName + '}', args[parameterName]);
+        this.config.headers[name] = value;
     }
 
-    request(method: Method, url: string, args: any, cb: any, accepts: string[]) {
-        this.config.baseURL += RequestBuilder.buildUrlWithParams(url, args);
+    addParametersToQuery(params: any) {
+        this.config.baseURL += '?';
+        this.config.baseURL += Object.keys(params).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
+    }
+
+    addParametersToForm(params: any) {
+        this.config.baseURL += '?';
+        this.config.baseURL += Object.keys(params).map((k) => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
+    }
+
+    request(method: Method, path: string, args: any, cb: any, request: any) {
         this.config.method = method;
 
-        if (method === 'post' || method === 'put') {
-            this.config.data = args;
-        }
+        this.config.baseURL += path;
 
-        console.log(this.config)
+        if (request.parameters.length) {
+            let queryParams: any = {};
+            let formParams: any = {};
+
+            request.parameters.forEach((param: any) => {
+                switch (param.in) {
+                    case 'path':
+                        this.addParametersToPath(args[param.name], param.name);
+                        break;
+                    case 'header':
+                        this.addParametersToHeader(param.name, args[param.name]);
+                        break;
+                    case 'query':
+                        queryParams[param.name] = args[param.name];
+                        break;
+                    case 'formData':
+                        queryParams[param.name] = args[param.name];
+                        break;
+                }
+            });
+
+            if (Object.keys(formParams).length) {
+                this.addParametersToForm(formParams);
+            }
+
+            if (Object.keys(queryParams).length) {
+                this.addParametersToQuery(queryParams);
+            }
+        }
 
         axios(this.config)
             .then((response: any) => {
-                cb(RequestBuilder.convertServerResponseToResponseState(response))
+                cb(RequestBuilder.convertServerResponseToResponseState(response), this.config)
             })
             .catch((error: any) => {
-                cb(RequestBuilder.convertServerResponseToResponseState(error.response))
+                cb(RequestBuilder.convertServerResponseToResponseState(error.response), this.config)
             });
     }
 
@@ -44,7 +80,7 @@ export default class RequestBuilder {
         if (!response) {
             return {
                 status: '000',
-                statusText: 'The Error was with this application, not your request',
+                statusText: 'The error was with this application, not your request',
                 data: {}
             }
         }
