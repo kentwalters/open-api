@@ -6,8 +6,8 @@ import EndPointBlock from "./components/EndpointBlock";
 import ApiParser from "./lib/ApiParser";
 import SettingsBlock from "./components/SettingsBlock";
 
-// const defaultApiSpec = require('./swagger.json');
-const defaultApiSpec = require('./uber.json');
+const defaultApiSpec = require('./swagger.json');
+// const defaultApiSpec = require('./uber.json');
 
 export default class App extends React.Component<any, any>{
     api: any = defaultApiSpec;
